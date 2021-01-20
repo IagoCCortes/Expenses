@@ -1,12 +1,13 @@
+using System;
 using System.Threading.Tasks;
-using Domain.Entities;
 using MongoDB.Driver;
 
-namespace Expenses.Application.Common.Interfaces
+namespace Application.Common.Interfaces
 {
-    public interface IMongoContext
+    public interface IMongoContext : IDisposable
     {
-         IMongoCollection<Product> Products { get; }
-         Task<IClientSessionHandle> StartSectionAsync();
+        void AddCommand(Func<Task> func);
+        Task<int> SaveChanges();
+        IMongoCollection<T> GetCollection<T>(string name);
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Expenses.Infrastructure.Persistence;
 using MongoDB.Driver;
+using Application.Common.Interfaces;
 
 namespace Expenses.Infrastructure
 {

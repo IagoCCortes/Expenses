@@ -5,51 +5,55 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using MongoDB.Bson.Serialization.Conventions;
+using System.Linq;
+using System.Threading;
+using Application.Common.Interfaces;
 
 namespace Expenses.Infrastructure.Persistence
 {
     public class MongoContext : IMongoContext
     {
-        private readonly IMongoDatabase _database;
-        private readonly MongoClient _client;
+        private IMongoDatabase _database;
+        private MongoClient _client;
+        private readonly List<Func<Task>> _commands;
+        private IClientSessionHandle _session;
         public MongoContext(IMongoDatabase database, MongoClient client)
-        {
+        {            
             _database = database;
             _client = client;
         }
 
-        public IMongoCollection<Product> Products
+        public async Task<int> SaveChanges()
         {
-            get => _database.GetCollection<Product>("Products", new MongoCollectionSettings { AssignIdOnInsert = true });
+            using (_session = await _client.StartSessionAsync())
+            {
+                _session.StartTransaction();
+
+                var commandTasks = _commands.Select(c => c());
+
+                await Task.WhenAll(commandTasks);
+
+                await _session.CommitTransactionAsync();
+            }
+
+            return _commands.Count;
         }
 
-        public Task<IClientSessionHandle> StartSectionAsync() =>  _client.StartSessionAsync();
-
-        public async Task<bool> TransactionAsync(IEnumerable<Func<Task>> operations)
+        public IMongoCollection<T> GetCollection<T>(string name)
         {
-            using var session = await _client.StartSessionAsync();
-            session.StartTransaction();
-
-            try
-            {
-                foreach (var operation in operations)
-                {
-                    await operation();
-                }
-                
-                await session.CommitTransactionAsync();
-                return true;
-            }
-            catch (Exception e)
-            {
-                await session.AbortTransactionAsync();
-                return false;
-            }
+            return _database.GetCollection<T>(name);
         }
 
         public void Dispose()
         {
+            _session?.Dispose();
             GC.SuppressFinalize(this);
+        }
+
+        public void AddCommand(Func<Task> func)
+        {
+            _commands.Add(func);
         }
     }
 }
