@@ -5,11 +5,9 @@ namespace Expenses.WebAPI.Services
 {
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
-            UserId = httpContextAccessor.HttpContext?.Request?.Headers["usuario"];
+            UserId = httpContextAccessor.HttpContext?.Request?.Headers["user"];
         }
 
         public string UserId { get; set; }

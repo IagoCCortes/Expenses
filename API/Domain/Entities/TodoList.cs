@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Expenses.Domain.Entities
 {
-    public class TodoList : AuditableEntity
+    public class TodoList
     {
         public int Id { get; set; }
 

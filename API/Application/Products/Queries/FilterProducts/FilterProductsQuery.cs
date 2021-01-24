@@ -3,46 +3,45 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Domain.Entities;
-using Expenses.Application.Common.Interfaces;
 using MediatR;
-using MongoDB.Driver;
+using Expenses.Domain.Entities;
+using Expenses.Application.Common.Interfaces.Repository;
 
 namespace Expenses.Application.Products.Queries.FilterProducts
 {
     public class FilterProductsQuery : IRequest<ProductsVm>
     {
-        public Guid Id { get; set; }
-        public float MaxPrice { get; set; }
-        public float MinPrice { get; set; }
-        public DateTime CreatedAfter { get; set; }
-        public DateTime CreatedBefore { get; set; }
+        public Guid? Id { get; set; }
+        public float? MaxPrice { get; set; }
+        public float? MinPrice { get; set; }
+        public DateTime? CreatedAfter { get; set; }
+        public DateTime? CreatedBefore { get; set; }
     }
 
     public class FilterProductsQueryHandler : IRequestHandler<FilterProductsQuery, ProductsVm>
     {
-        private readonly IMongoContext _context;
+        private readonly IProductRepository _repository;
         private readonly IMapper _mapper;
 
-        public FilterProductsQueryHandler(IMongoContext context, IMapper mapper)
+        public FilterProductsQueryHandler(IProductRepository repository, IMapper mapper)
         {
             _mapper = mapper;
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<ProductsVm> Handle(FilterProductsQuery request, CancellationToken cancellationToken)
         {
-            var builder = Builders<Product>.Filter;
-            var filter = builder.Eq(x => x.Id, request.Id)
-                & builder.Gte(x => x.Price, request.MinPrice)
-                & builder.Lte(x => x.Price, request.MaxPrice)
-                & builder.Gte(x => x.Created, request.CreatedAfter)
-                & builder.Lte(x => x.Created, request.CreatedBefore);
-            var results = await _context.Products.Find(filter).ToListAsync();
+            var results = await _repository.GetByExpression(product =>
+                (request.Id == null || product.Id == request.Id)
+                && (request.MinPrice == null || product.Price >= request.MinPrice)
+                && (request.MaxPrice == null || product.Price <= request.MaxPrice)
+                && (request.CreatedAfter == null || product.Created >= request.CreatedAfter)
+                && (request.CreatedBefore == null || product.Created <= request.CreatedBefore)
+            );
 
             var products = _mapper.Map<List<Product>, List<ProductDto>>(results);
 
-            return new ProductsVm {Products = products};
+            return new ProductsVm { Products = products };
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
-using Domain.Entities;
 using Expenses.Application.Common.Mappings;
+using Expenses.Domain.Entities;
 
 namespace Expenses.Application.Products.Queries.FilterProducts
 {

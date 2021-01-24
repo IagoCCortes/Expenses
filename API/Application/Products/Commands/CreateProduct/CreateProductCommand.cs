@@ -1,28 +1,31 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities;
 using Expenses.Application.Common.Interfaces;
+using Expenses.Application.Common.Interfaces.Repository;
+using Expenses.Domain.Entities;
 using MediatR;
 
 namespace Expenses.Application.Products.Commands.CreateProduct
 {
-    public class CreateProductCommand : IRequest<Guid>
+    public class CreateProductCommand : IRequest<bool>
     {
         public string Name { get; set; }
         public float Price { get; set; }
     }
 
-    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Guid>
+    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, bool>
     {
-        private readonly IMongoContext _context;
+        private readonly IProductRepository _repository;
+        private readonly IUnitOfWork _uor;
 
-        public CreateProductCommandHandler(IMongoContext context)
+        public CreateProductCommandHandler(IProductRepository repository, IUnitOfWork uor)
         {
-            _context = context;
+            _uor = uor;
+            _repository = repository;
         }
 
-        public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var entity = new Product
             {
@@ -30,9 +33,9 @@ namespace Expenses.Application.Products.Commands.CreateProduct
                 Price = request.Price,
             };
 
-            await _context.Products.InsertOneAsync(entity);
+            _repository.Add(entity);
 
-            return entity.Id;
+            return await _uor.Commit();
         }
     }
-}   
+}
