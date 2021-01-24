@@ -23,7 +23,21 @@ namespace Expenses.Infrastructure.Persistence.Repository
 
         public virtual void Add(TEntity obj)
         {
+            obj.Created = DateTime.Now;
+            obj.CreatedBy = Context.CurrentUserService.UserId;
             Context.AddCommand(() => DbSet.InsertOneAsync(obj));
+        }
+
+        public virtual void Update(TEntity obj)
+        {
+            obj.LastModified = DateTime.Now;
+            obj.LastModifiedBy = Context.CurrentUserService.UserId;
+            Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.Id), obj));
+        }
+
+        public virtual void Remove(Guid id)
+        {
+            Context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id)));
         }
 
         public virtual async Task<TEntity> GetById(Guid id)
@@ -40,16 +54,6 @@ namespace Expenses.Infrastructure.Persistence.Repository
 
         public virtual async Task<List<TEntity>> GetByExpression(Expression<Func<TEntity, bool>> expression) => 
             await DbSet.AsQueryable().Where(expression).ToListAsync();
-
-        public virtual void Update(TEntity obj)
-        {
-            Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.Id), obj));
-        }
-
-        public virtual void Remove(Guid id)
-        {
-            Context.AddCommand(() => DbSet.DeleteOneAsync(Builders<TEntity>.Filter.Eq("_id", id)));
-        }
 
         public void Dispose()
         {

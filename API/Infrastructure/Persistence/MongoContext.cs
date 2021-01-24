@@ -14,10 +14,10 @@ namespace Expenses.Infrastructure.Persistence
         private MongoClient _client;
         private readonly List<Func<Task>> _commands;
         private IClientSessionHandle _session;
-        private readonly ICurrentUserService _currentUserService;
+        public ICurrentUserService CurrentUserService { get; }
         public MongoContext(IMongoDatabase database, MongoClient client, ICurrentUserService currentUserService)
         {
-            _currentUserService = currentUserService;
+            CurrentUserService = currentUserService;
             _database = database;
             _client = client;
             _commands = new List<Func<Task>>();
@@ -29,16 +29,20 @@ namespace Expenses.Infrastructure.Persistence
         {
             using (_session = await _client.StartSessionAsync())
             {
-                _session.StartTransaction();
-
-                var commandTasks = _commands.Select(command => command());
-
-                await Task.WhenAll(commandTasks);
-
-                await _session.CommitTransactionAsync();
+                // _session.StartTransaction();
+                try
+                {
+                    var commandTasks = _commands.Select(command => command());
+                    await Task.WhenAll(commandTasks);
+                    // await _session.CommitTransactionAsync();
+                }
+                catch (Exception e)
+                {
+                    // await _session.AbortTransactionAsync();
+                    return 0;
+                }
+                return _commands.Count;
             }
-
-            return _commands.Count;
         }
 
         public IMongoCollection<T> GetCollection<T>(string name) => _database.GetCollection<T>(name);

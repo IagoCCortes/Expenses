@@ -20,7 +20,7 @@ namespace Expenses.Infrastructure
             var client = new MongoClient(configuration.GetSection("MongoDbSettings").GetSection("ConnectionString").Value);
             var databaseName = configuration.GetSection("MongoDbSettings").GetSection("DatabaseName").Value;
             var database = client.GetDatabase(databaseName);
-            services.AddSingleton<IMongoContext>(provider => new MongoContext(database, client, provider.GetRequiredService<ICurrentUserService>()));
+            services.AddScoped<IMongoContext>(provider => new MongoContext(database, client, provider.GetRequiredService<ICurrentUserService>()));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IDomainEventService, DomainEventService>();
