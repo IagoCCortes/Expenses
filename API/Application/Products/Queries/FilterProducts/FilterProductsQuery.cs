@@ -1,12 +1,14 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Domain.Entities;
 using Expenses.Application.Common.Interfaces;
 using MediatR;
+using MongoDB.Driver.Linq;
 using MongoDB.Driver;
+using Expenses.Domain.Entities;
 
 namespace Expenses.Application.Products.Queries.FilterProducts
 {
@@ -32,13 +34,14 @@ namespace Expenses.Application.Products.Queries.FilterProducts
 
         public async Task<ProductsVm> Handle(FilterProductsQuery request, CancellationToken cancellationToken)
         {
-            var builder = Builders<Product>.Filter;
-            var filter = builder.Eq(x => x.Id, request.Id)
-                & builder.Gte(x => x.Price, request.MinPrice)
-                & builder.Lte(x => x.Price, request.MaxPrice)
-                & builder.Gte(x => x.Created, request.CreatedAfter)
-                & builder.Lte(x => x.Created, request.CreatedBefore);
-            var results = await _context.Products.Find(filter).ToListAsync();
+            // var builder = Builders<Product>.Filter;
+            // var filter = builder.Eq(x => x.Id, request.Id)
+            //     & builder.Gte(x => x.Price, request.MinPrice)
+            //     & builder.Lte(x => x.Price, request.MaxPrice)
+            //     & builder.Gte(x => x.Created, request.CreatedAfter)
+            //     & builder.Lte(x => x.Created, request.CreatedBefore);
+            // var results = await _context.Products.Select(x => x).ToListAsync();
+            var results = _context.Products.;
 
             var products = _mapper.Map<List<Product>, List<ProductDto>>(results);
 

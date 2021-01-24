@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain.Entities;
 using Expenses.Application.Common.Interfaces;
+using Expenses.Domain.Entities;
 using MediatR;
 
 namespace Expenses.Application.Products.Commands.CreateProduct
@@ -30,7 +30,7 @@ namespace Expenses.Application.Products.Commands.CreateProduct
                 Price = request.Price,
             };
 
-            await _context.Products.InsertOneAsync(entity);
+            await _context.Insert<Product>(entity);
 
             return entity.Id;
         }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Expenses.Infrastructure.Persistence;
 using MongoDB.Driver;
-using Application.Common.Interfaces;
+using Expenses.Infrastructure.Persistence.Configurations;
 
 namespace Expenses.Infrastructure
 {
@@ -13,10 +13,12 @@ namespace Expenses.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            MongoConfiguration.Configure();
+
             var client = new MongoClient(configuration.GetSection("MongoDbSettings").GetSection("ConnectionString").Value);
             var databaseName = configuration.GetSection("MongoDbSettings").GetSection("DatabaseName").Value;
             var database = client.GetDatabase(databaseName);
-            services.AddSingleton<IMongoContext>(new MongoContext(database, client));
+            services.AddSingleton<IMongoContext>(provider => new MongoContext(database, client, provider.GetRequiredService<ICurrentUserService>()));
             services.AddScoped<IDomainEventService, DomainEventService>();
 
             services.AddTransient<IDateTime, DateTimeService>();

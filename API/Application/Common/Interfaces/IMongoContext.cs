@@ -1,13 +1,21 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Driver;
+using Expenses.Domain.Common;
+using Expenses.Domain.Entities;
+using MongoDB.Driver.Linq;
 
-namespace Application.Common.Interfaces
+namespace Expenses.Application.Common.Interfaces
 {
     public interface IMongoContext : IDisposable
     {
-        void AddCommand(Func<Task> func);
+        IMongoQueryable<Product> Products { get; }
+        Task Insert<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
+        Task Update<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
+        Task Delete<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
+        void AddInsertToTransaction<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
+        void AddUpdateToTransaction<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
+        void AddDeleteToTransaction<TEntity>(IMongoEntity obj) where TEntity : IMongoEntity;
         Task<int> SaveChanges();
-        IMongoCollection<T> GetCollection<T>(string name);
     }
 }
