@@ -2,9 +2,8 @@ using System;
 
 namespace Expenses.Domain.Common
 {
-    public interface IMongoEntity
+    public interface IEntity
     {
         Guid Id { get; set; }
-        string TableName { get; }
     }
 }

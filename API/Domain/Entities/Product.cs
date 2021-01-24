@@ -3,7 +3,7 @@ using Expenses.Domain.Common;
 
 namespace Expenses.Domain.Entities
 {
-    public class Product : IAuditableEntity, IMongoEntity
+    public class Product : IAuditableEntity, IEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

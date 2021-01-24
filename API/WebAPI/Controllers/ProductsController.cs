@@ -15,7 +15,7 @@ namespace Expenses.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Guid>> Create(CreateProductCommand command)
+        public async Task<ActionResult<bool>> Create(CreateProductCommand command)
         {
             return await Mediator.Send(command);
         }
