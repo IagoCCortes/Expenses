@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Expenses.Application.Products.Commands.CreateProduct;
+using Expenses.Application.Products.Commands.UpdateProduct;
 using Expenses.Application.Products.Queries.FilterProducts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,12 @@ namespace Expenses.WebAPI.Controllers
 
         [HttpPost]
         public async Task<ActionResult<bool>> Create(CreateProductCommand command)
+        {
+            return await Mediator.Send(command);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<bool>> Update(UpdateProductCommand command)
         {
             return await Mediator.Send(command);
         }
