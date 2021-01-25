@@ -16,6 +16,7 @@ namespace Expenses.Application.Products.Queries.FilterProducts
         public float? MinPrice { get; set; }
         public DateTime? CreatedAfter { get; set; }
         public DateTime? CreatedBefore { get; set; }
+        public string CreatedBy { get; set; }
     }
 
     public class FilterProductsQueryHandler : IRequestHandler<FilterProductsQuery, ProductsVm>
@@ -37,6 +38,7 @@ namespace Expenses.Application.Products.Queries.FilterProducts
                 && (request.MaxPrice == null || product.Price <= request.MaxPrice)
                 && (request.CreatedAfter == null || product.Created >= request.CreatedAfter)
                 && (request.CreatedBefore == null || product.Created <= request.CreatedBefore)
+                && (request.CreatedBy == null || product.CreatedBy.ToLower().Contains(request.CreatedBy.ToLower()))
             );
 
             var products = _mapper.Map<List<Product>, List<ProductDto>>(results);
