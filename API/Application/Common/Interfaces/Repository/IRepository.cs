@@ -6,7 +6,7 @@ using Expenses.Domain.Common;
 
 namespace Expenses.Application.Common.Interfaces.Repository
 {
-    public interface IRepository<TEntity> : IDisposable where TEntity : IEntity
+    public interface IRepository<TEntity> : IDisposable where TEntity : Entity
     {
         void Add(TEntity obj);
         Task<TEntity> GetById(Guid id);

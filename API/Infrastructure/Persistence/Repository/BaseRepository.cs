@@ -9,7 +9,7 @@ using MongoDB.Driver.Linq;
 
 namespace Expenses.Infrastructure.Persistence.Repository
 {
-    public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : IEntity
+    public abstract class BaseRepository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         protected readonly IMongoContext Context;
         protected IMongoCollection<TEntity> DbSet;
@@ -23,15 +23,13 @@ namespace Expenses.Infrastructure.Persistence.Repository
 
         public virtual void Add(TEntity obj)
         {
-            obj.Created = DateTime.Now;
-            obj.CreatedBy = Context.CurrentUserService.UserId;
+            obj.Create(Context.CurrentUserService.UserId);
             Context.AddCommand(() => DbSet.InsertOneAsync(obj));
         }
 
         public virtual void Update(TEntity obj)
         {
-            obj.LastModified = DateTime.Now;
-            obj.LastModifiedBy = Context.CurrentUserService.UserId;
+            obj.Update(Context.CurrentUserService.UserId);
             Context.AddCommand(() => DbSet.ReplaceOneAsync(Builders<TEntity>.Filter.Eq("_id", obj.Id), obj));
         }
 

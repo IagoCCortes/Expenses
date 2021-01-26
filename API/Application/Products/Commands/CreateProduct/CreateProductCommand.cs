@@ -27,11 +27,7 @@ namespace Expenses.Application.Products.Commands.CreateProduct
 
         public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            var entity = new Product
-            {
-                Name = request.Name,
-                Price = request.Price,
-            };
+            var entity = new Product(request.Name, request.Price);
 
             _repository.Add(entity);
 

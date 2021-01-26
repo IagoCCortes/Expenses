@@ -10,8 +10,8 @@ namespace Expenses.WebAPI.Controllers
 {
     public class ProductsController : ApiControllerBase
     {
-        [HttpPost("filter")]
-        public async Task<ActionResult<ProductsVm>> GetProducts(FilterProductsQuery query)
+        [HttpGet("filter")]
+        public async Task<ActionResult<ProductsVm>> GetProducts([FromQuery] FilterProductsQuery query)
         {
             return await Mediator.Send(query);
         }
