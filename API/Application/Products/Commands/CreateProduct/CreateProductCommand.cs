@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Expenses.Application.Common.Interfaces;
@@ -11,7 +10,8 @@ namespace Expenses.Application.Products.Commands.CreateProduct
     public class CreateProductCommand : IRequest<bool>
     {
         public string Name { get; set; }
-        public float Price { get; set; }
+        public string Currency { get; set; }
+        public decimal Price { get; set; }
     }
 
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, bool>
@@ -27,7 +27,7 @@ namespace Expenses.Application.Products.Commands.CreateProduct
 
         public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            var entity = new Product(request.Name, request.Price);
+            var entity = new Product(request.Name, request.Currency, request.Price);
 
             _repository.Add(entity);
 

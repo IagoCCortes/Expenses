@@ -4,7 +4,7 @@ namespace Expenses.Domain.Common
 {
     public abstract class Entity
     {
-        public Guid Id { get;  set; }
+        public Guid Id { get; private set; }
         public DateTime Created { get; private set; }
         public string CreatedBy { get; private set; }
         public DateTime? LastModified { get; private set; }

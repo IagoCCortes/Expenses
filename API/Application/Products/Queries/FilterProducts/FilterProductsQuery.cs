@@ -32,15 +32,6 @@ namespace Expenses.Application.Products.Queries.FilterProducts
 
         public async Task<ProductsVm> Handle(FilterProductsQuery request, CancellationToken cancellationToken)
         {
-            // var results = await _repository.GetByExpression(product =>
-            //     (request.Id == null || product.Id == request.Id)
-            //     && (request.MinPrice == null || product.Price >= request.MinPrice)
-            //     && (request.MaxPrice == null || product.Price <= request.MaxPrice)
-            //     && (request.CreatedAfter == null || product.Created >= request.CreatedAfter)
-            //     && (request.CreatedBefore == null || product.Created <= request.CreatedBefore)
-            //     && (string.IsNullOrWhiteSpace(request.CreatedBy) || product.CreatedBy.ToLower().Contains(request.CreatedBy.ToLower()))
-            // );
-
             var results = await _repository.FilterProducts(request);
 
             var products = _mapper.Map<List<Product>, List<ProductDto>>(results);

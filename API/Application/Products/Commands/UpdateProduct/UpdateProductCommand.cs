@@ -13,7 +13,8 @@ namespace Expenses.Application.Products.Commands.UpdateProduct
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public float Price { get; set; }
+        public string Currency { get; set; }
+        public decimal? Price { get; set; }
     }
 
     public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, bool>
@@ -33,8 +34,8 @@ namespace Expenses.Application.Products.Commands.UpdateProduct
 
             if (entity == null) throw new NotFoundException(nameof(Product), request.Id);
 
-            if (request.Name != null) entity.Name = request.Name;
-            if (request.Price != 0) entity.Price = request.Price;
+            if (request.Name != null) entity.UpdateName(request.Name);
+            entity.UpdatePrice(request.Currency, request.Price);
 
             _repository.Update(entity);
 
